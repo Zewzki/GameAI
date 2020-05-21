@@ -33,7 +33,11 @@ while success:
     cap[:, :, 1] = g
     cap[:, :, 2] = b
 
+    #cap = cv2.resize(cap, (800,800))
+
     cv2.imshow('test', cap)
+
+    
 
     key = cv2.waitKey(1)
     if key == 27:
