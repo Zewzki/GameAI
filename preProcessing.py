@@ -29,38 +29,31 @@ sct = mss()
 
 success = True
 
-def createModel():
+#backbone = keras.applications.Xception(include_top = False, weights = 'imagenet', input_shape = (w, h, 3), classes = 10)
 
-    model = keras.Sequential()
+#for layer in backbone.layers:
+#    layer.trainable = False
 
-    model.add(keras.layers.Conv2D(32, (3, 3), padding = 'same', activation = 'relu', input_shape = (h, w, 3)))
-    model.add(keras.layers.Conv2D(32, (3, 3), padding = 'same', activation = 'relu'))
-    model.add(keras.layers.MaxPool2D())
-
-    model.add(keras.layers.Flatten())
-    model.add(keras.layers.Dense(512, activation = 'relu'))
-    model.add(keras.layers.Dense(128, activation = 'relu'))
-    model.add(keras.layers.Dense(10, activation = 'relu'))
-
-    return model
-
-adam = keras.optimizers.Adam(learning_rate = .00001)
-m = createModel()
-m.compile(optimizer = adam, loss = 'categorical_crossentropy', metrics = ['accuracy'])
+#backbone.summary()
     
 while success:
 
-    cap = sct.grab(boundingBox)
-    cap = np.array(cap)
-
-    cap = cv2.resize(cap, (w, h))
-    cv2.imshow('Program View', cap)
-
-    dimmedCap = cap[:, :, 0:3]
-    dimmedCap = np.expand_dims(np.array(dimmedCap), axis = 0)
+    try:
     
-    #predictionList = list(m.predict(dimmedCap))
-    #print(predictionList)
+        cap = sct.grab(boundingBox)
+        cap = np.array(cap)
+
+        cap = cv2.resize(cap, (w, h))
+        cv2.imshow('Program View', cap)
+
+        dimmedCap = cap[:, :, 0:3]
+        dimmedCap = np.expand_dims(np.array(dimmedCap), axis = 0)
+    
+        #predictionList = list(m.predict(dimmedCap))
+        #print(predictionList)
+
+    except:
+        success = False
 
     key = cv2.waitKey(1)
     if key == 27:
