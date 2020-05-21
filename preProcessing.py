@@ -8,6 +8,10 @@ import keyboard
 #from tensorflow import keras
 import tensorflow as tf
 import keras
+from keras.applications.xception import Xception
+from keras.models import load_model
+
+keras.backend.clear_session()
 
 user = ctypes.windll.user32
 
@@ -23,38 +27,51 @@ print('Height: %s' % sHeight)
 boundingBox = {'top': 0, 'left': 0, 'width': sWidth, 'height': sHeight}
 actionButtons = ('up', 'down', 'left', 'right', 'z', 'x', 'v' 'q', 'c', 'left shift')
 
+success = True
+
+#weightsPath = 'xceptionNoTop.h5'
+weightsPath = 'xception.h5'
+
+nClasses = 10
+pressThresh = .8
+
+backbone = Xception(include_top = True, weights = None, input_tensor = None, input_shape = (w, h, 1), classes = nClasses)
+backbone.load_weights(weightsPath)
+
+for i in range(0, len(backbone.layers) - 1):
+    backbone.layers[i].trainable = False
+
+#backbone.summary()
+
 cv2.namedWindow('Program View')
 
 sct = mss()
 
-success = True
-
-#backbone = keras.applications.Xception(include_top = False, weights = 'imagenet', input_shape = (w, h, 3), classes = 10)
-
-#for layer in backbone.layers:
-#    layer.trainable = False
-
-#backbone.summary()
+def preProcessInput(org):
+    print(org.shape)
+    org /= 255.0
+    org -= 0.5
+    org *= 2.0
+    return org
     
 while success:
 
-    try:
+    cap = sct.grab(boundingBox)
+    cap = np.array(cap)
+    cap = cv2.cvtColor(cap, cv2.COLOR_BGR2GRAY)
+    cap = cv2.resize(cap, (w, h))
+    cap = np.transpose(cap)
+
+    cap = preProcessInput(cap)
+    cap = np.expand_dims(cap, axis = 2)
     
-        cap = sct.grab(boundingBox)
-        cap = np.array(cap)
-
-        cap = cv2.resize(cap, (w, h))
-        cv2.imshow('Program View', cap)
-
-        dimmedCap = cap[:, :, 0:3]
-        dimmedCap = np.expand_dims(np.array(dimmedCap), axis = 0)
+    cap = np.expand_dims(cap, axis = 0)
     
-        #predictionList = list(m.predict(dimmedCap))
-        #print(predictionList)
+    #predictionList = list(m.predict(cap))
+    #print(predictionList)
 
-    except:
-        success = False
-
+    cv2.imshow('Program View', cap)
+    
     key = cv2.waitKey(1)
     if key == 27:
         success = False

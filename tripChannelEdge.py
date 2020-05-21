@@ -33,6 +33,8 @@ while success:
     cap[:, :, 1] = g
     cap[:, :, 2] = b
 
+    #cap = cv2.resize(cap, (int(sWidth / 2), int(sHeight / 2)))
+    
     cv2.imshow('test', cap)
 
     key = cv2.waitKey(1)
